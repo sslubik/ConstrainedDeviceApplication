@@ -1,0 +1,3 @@
+[Gateway Device]
+# Specifies the time in seconds between system telemetry collections.
+POLL_RATE = 60

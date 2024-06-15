@@ -3,3 +3,12 @@
 
 # Ignore Gradle build output directory
 build
+
+# Ignore bin files
+app/bin
+
+# Ignore kls_database.db file
+kls_database.db
+
+# Ignore local config files
+*.props

@@ -16,11 +16,19 @@ repositories {
 }
 
 dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.32")
+    annotationProcessor("org.projectlombok:lombok:1.18.32")
+    testCompileOnly("org.projectlombok:lombok:1.18.32")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
+
     // Use JUnit test framework.
     testImplementation(libs.junit)
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    // This dependency is used to retrieve OS data
+    implementation("com.github.oshi:oshi-core:6.6.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -32,5 +40,13 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "org.cda.Main"
+}
+
+tasks.withType<Copy> {
+    from("src/main/resources") {
+        include("config.props")
+        include("config.props.template")
+        into("build/resources/main")
+    }
 }
