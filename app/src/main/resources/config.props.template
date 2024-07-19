@@ -1,3 +1,5 @@
-[Gateway Device]
+[Constrained Device]
 # Specifies the time in seconds between system telemetry collections.
 POLL_RATE = 60
+ENABLE_SYSTEM_TELEMETRY = True
+ENABLE_EMULATION = True
