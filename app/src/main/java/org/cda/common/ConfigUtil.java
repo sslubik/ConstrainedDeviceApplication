@@ -44,7 +44,7 @@ public class ConfigUtil {
     }
 
     /**
-     * Returns a value loaded from config.properties file.
+     * Returns a value loaded from config.props file.
      *
      */
     public String getString(ConfigStrings key) {
@@ -52,13 +52,13 @@ public class ConfigUtil {
     }
 
     /**
-     * Returns a value loaded from config.properties file parsed as an integer.
+     * Returns a value loaded from config.props file parsed as an integerr
      *
      * @throws IllegalStateException when the parameter cannot be parsed as an int
      *                               and the application didn't terminate.
      *
      */
-    public int getIntiger(ConfigIntegers key) {
+    public int getInteger(ConfigIntegers key) {
         try {
             String property = this.properties.getProperty(key.name());
 
@@ -75,7 +75,7 @@ public class ConfigUtil {
     }
 
     /**
-     * Returns a value loaded form config.properties file parsed as a float.
+     * Returns a value loaded form config.props file parsed as a float.
      *
      * @throws IllegalStateException when the parameter cannot be parsed as a float
      *                               and the application didn't terminate.
@@ -95,5 +95,15 @@ public class ConfigUtil {
         }
 
         throw new IllegalStateException("Unexpected Error: failed to shut down the application after logging an error");
+    }
+
+    /**
+     * Returns a boolean loaded from config.props file.
+     *
+     */
+    public boolean getBoolean(ConfigBooleans key) {
+        String property = this.properties.getProperty(key.name());
+
+        return Boolean.parseBoolean(property);
     }
 }
