@@ -12,3 +12,6 @@ kls_database.db
 
 # Ignore local config files
 *.props
+
+# Ignore .settings file
+*.prefs
