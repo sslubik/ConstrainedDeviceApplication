@@ -1,4 +1,4 @@
-package org.cda.system;
+package org.cda.managers;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import org.cda.common.ConfigUtil;
 import org.cda.common.enums.ConfigIntegers;
+import org.cda.data.SystemData;
 import org.cda.system.systemmonitors.*;
 
 import lombok.extern.java.Log;
@@ -20,13 +21,14 @@ import oshi.hardware.Sensors;
 @Log
 public class SystemPerformanceManager {
 
-    private final ScheduledExecutorService schedExecSrvc = Executors.newScheduledThreadPool(1);
-    private final Runnable taskRunner;
-
-    private final AbstractSystemResourceMonitor[] systemMonitors;
-
+    private SystemData systemData;
     private boolean isStarted = false;
     private int pollRate;
+
+    private final SystemResourceMonitorInterface[] systemMonitors;
+
+    private final ScheduledExecutorService schedExecSrvc = Executors.newScheduledThreadPool(1);
+    private final Runnable taskRunner;
 
     /**
      * Logger setup.
@@ -44,21 +46,22 @@ public class SystemPerformanceManager {
      * Default constructor.
      *
      */
-    public SystemPerformanceManager() {
-        SystemInfo sysInfo = new SystemInfo();
+    public SystemPerformanceManager(SystemData systemData) {
+        this.systemData = systemData;
 
+        SystemInfo sysInfo = new SystemInfo();
         HardwareAbstractionLayer hal = sysInfo.getHardware();
         CentralProcessor cpu = hal.getProcessor();
         Sensors sensors = hal.getSensors();
-        GlobalMemory memory = hal.getMemory(); 
+        GlobalMemory memory = hal.getMemory();
 
-        this.systemMonitors = new AbstractSystemResourceMonitor[] {
+        this.systemMonitors = new SystemResourceMonitorInterface[] {
                 new SystemCpuMonitor(cpu, sensors),
                 new SystemMemoryMonitor(memory),
                 new SystemDiskMonitor()
         };
 
-        this.pollRate = ConfigUtil.getInstance().getIntiger(ConfigIntegers.POLL_RATE);
+        this.pollRate = ConfigUtil.getInstance().getInteger(ConfigIntegers.POLL_RATE);
         this.pollRate = Math.max(pollRate, 10); // Set to 10 in case a negative number is provided
 
         this.taskRunner = () -> {
@@ -67,31 +70,20 @@ public class SystemPerformanceManager {
     }
 
     /**
-     * Handles telemetry by logging telemetry values to console.
+     * Handles telemetry by running
+     * SystemResourceMonitorInterface.collectTelemetry()
+     * on each SystemResourceMonitor that has been added to the systemMonitors
+     * array.
      *
      */
     public void handleTelemetry() {
-        SystemPerformanceManager.log.info("System telemetry");
-
-        for (AbstractSystemResourceMonitor monitor : this.systemMonitors) {
-            SystemPerformanceManager.log.fine("\t" + monitor.getResource().getName() + ": ");
-
-            for (SystemData sd : monitor.getTelemetry()) {
-                String formattedValue = String.format("%.2f", sd.getValue());
-
-                System.out.println(
-                        "\t"
-                                + sd.getParameter().getName()
-                                + ": "
-                                + formattedValue
-                                + " "
-                                + sd.getUnit().getName());
-            }
+        for (var monitor : this.systemMonitors) {
+            monitor.collectTelemetry(this.systemData);
         }
     }
 
     /**
-     * Starts collecting Gateway Device system telemetry data.
+     * Starts collecting system telemetry data.
      *
      */
     public void start() {
@@ -107,7 +99,7 @@ public class SystemPerformanceManager {
     }
 
     /**
-     * Terminates collecting Gateway Device system telemetry data.
+     * Terminates collecting system telemetry data.
      *
      */
     public void stop() {

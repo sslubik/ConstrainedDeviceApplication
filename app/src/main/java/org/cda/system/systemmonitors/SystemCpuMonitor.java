@@ -1,37 +1,30 @@
 package org.cda.system.systemmonitors;
 
-import org.cda.common.enums.Units;
-import org.cda.common.enums.Parameters;
-import org.cda.system.SystemData;
-import org.cda.system.enums.SystemResources;
+import org.cda.data.SystemData;
 
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.Sensors;
 
-public class SystemCpuMonitor extends AbstractSystemResourceMonitor {
+public class SystemCpuMonitor implements SystemResourceMonitorInterface {
 
     private final CentralProcessor cpu;
     private final Sensors sensors;
 
     public SystemCpuMonitor(CentralProcessor cpu, Sensors sensors) {
-
-        this.resource = SystemResources.CPU;
         this.cpu = cpu;
         this.sensors = sensors;
     }
 
     /**
-     * Returns array of data related to CPU.
+     * Sets CPU Temperature in degC and CPU usage in % in a SystemData object.
      *
      */
     @Override
-    public SystemData[] getTelemetry() {
+    public void collectTelemetry(SystemData systemData) {
         double[] loadAvg = this.cpu.getSystemLoadAverage(1);
         double cpuTemp = this.sensors.getCpuTemperature();
 
-        return new SystemData[] {
-                new SystemData(Parameters.USAGE, loadAvg[0] * 100, Units.PERCENT),
-                new SystemData(Parameters.TEMPERATURE, cpuTemp, Units.CELSIUS)
-        };
+        systemData.setCpuLoadAvg(loadAvg[0] * 100);
+        systemData.setCpuTemp(cpuTemp);
     }
 }
