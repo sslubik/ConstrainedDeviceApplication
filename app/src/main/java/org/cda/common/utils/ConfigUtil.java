@@ -1,4 +1,4 @@
-package org.cda.common;
+package org.cda.common.utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

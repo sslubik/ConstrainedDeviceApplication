@@ -2,7 +2,7 @@ package org.cda.devices.i2c.bme280;
 
 import java.text.DecimalFormat;
 
-import org.cda.common.ConfigUtil;
+import org.cda.common.utils.ConfigUtil;
 import org.cda.common.enums.ConfigIntegers;
 import org.cda.data.WeatherData;
 import org.cda.devices.i2c.AbstractI2CSensor;

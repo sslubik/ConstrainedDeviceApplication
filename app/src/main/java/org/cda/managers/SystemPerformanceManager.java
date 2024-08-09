@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
-import org.cda.common.ConfigUtil;
+import org.cda.common.utils.ConfigUtil;
 import org.cda.common.enums.ConfigIntegers;
 import org.cda.data.SystemData;
 import org.cda.system.systemmonitors.*;
