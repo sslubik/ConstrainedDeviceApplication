@@ -114,23 +114,23 @@ public class BME280Device extends AbstractI2CSensor {
     }
 
     private void collectCalibrationParams() {
-        this.dig_T1 = this.read16u(BME280RegisterAddresses.dig_T1);
-        this.dig_T2 = this.read16s(BME280RegisterAddresses.dig_T2);
-        this.dig_T3 = this.read16s(BME280RegisterAddresses.dig_T3);
+        this.dig_T1 = super.read16u(BME280RegisterAddresses.dig_T1);
+        this.dig_T2 = super.read16s(BME280RegisterAddresses.dig_T2);
+        this.dig_T3 = super.read16s(BME280RegisterAddresses.dig_T3);
 
-        this.dig_P1 = this.read16u(BME280RegisterAddresses.dig_P1);
-        this.dig_P2 = this.read16s(BME280RegisterAddresses.dig_P2);
-        this.dig_P3 = this.read16s(BME280RegisterAddresses.dig_P3);
-        this.dig_P4 = this.read16s(BME280RegisterAddresses.dig_P4);
-        this.dig_P5 = this.read16s(BME280RegisterAddresses.dig_P5);
-        this.dig_P6 = this.read16s(BME280RegisterAddresses.dig_P6);
-        this.dig_P7 = this.read16s(BME280RegisterAddresses.dig_P7);
-        this.dig_P8 = this.read16s(BME280RegisterAddresses.dig_P8);
-        this.dig_P9 = this.read16s(BME280RegisterAddresses.dig_P9);
+        this.dig_P1 = super.read16u(BME280RegisterAddresses.dig_P1);
+        this.dig_P2 = super.read16s(BME280RegisterAddresses.dig_P2);
+        this.dig_P3 = super.read16s(BME280RegisterAddresses.dig_P3);
+        this.dig_P4 = super.read16s(BME280RegisterAddresses.dig_P4);
+        this.dig_P5 = super.read16s(BME280RegisterAddresses.dig_P5);
+        this.dig_P6 = super.read16s(BME280RegisterAddresses.dig_P6);
+        this.dig_P7 = super.read16s(BME280RegisterAddresses.dig_P7);
+        this.dig_P8 = super.read16s(BME280RegisterAddresses.dig_P8);
+        this.dig_P9 = super.read16s(BME280RegisterAddresses.dig_P9);
 
-        this.dig_H1 = this.read8u(BME280RegisterAddresses.dig_H1);
-        this.dig_H2 = this.read16s(BME280RegisterAddresses.dig_H2);
-        this.dig_H3 = this.read8u(BME280RegisterAddresses.dig_H3);
+        this.dig_H1 = super.read8u(BME280RegisterAddresses.dig_H1);
+        this.dig_H2 = super.read16s(BME280RegisterAddresses.dig_H2);
+        this.dig_H3 = super.read8u(BME280RegisterAddresses.dig_H3);
 
         byte[] buffer = new byte[2];
 
@@ -140,7 +140,7 @@ public class BME280Device extends AbstractI2CSensor {
         this.sensor.readRegister(BME280RegisterAddresses.dig_H5, buffer);
         this.dig_H5 = (short) (((buffer[1] & 0xFF) << 4) | ((buffer[0] & 0xF0) >> 4));
 
-        this.dig_H6 = this.read8s(BME280RegisterAddresses.dig_H6);
+        this.dig_H6 = super.read8s(BME280RegisterAddresses.dig_H6);
     }
 
     /**
