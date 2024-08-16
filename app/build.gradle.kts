@@ -27,6 +27,9 @@ dependencies {
     // This dependency is used by the application.
     implementation(libs.guava)
 
+    // This dependency is used to parse objects to JSON and JSON to objects
+    implementation("com.google.code.gson:gson:2.11.0")
+
     // This dependency is used to retrieve OS data
     implementation("com.github.oshi:oshi-core:6.6.1")
 

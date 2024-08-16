@@ -1,16 +1,14 @@
 package org.cda;
 
 import org.cda.app.App;
-import org.cda.data.SystemData;
-import org.cda.managers.SystemPerformanceManager;
+import org.cda.managers.DeviceDataManager;
 
 public class Main {
     public static void main(String[] args) {
-        App gda = new App(
+        App cda = new App(
                 args,
-                new SystemPerformanceManager(new SystemData()));
+                new DeviceDataManager());
 
-        gda.start();
-        gda.stop();
+        cda.run();
     }
 }

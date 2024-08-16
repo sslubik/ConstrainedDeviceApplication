@@ -3,14 +3,14 @@ package org.cda.app;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
-import org.cda.managers.SystemPerformanceManager;
+import org.cda.managers.DeviceDataManager;
 
 import lombok.extern.java.Log;
 
 @Log
 public class App {
 
-    private SystemPerformanceManager sysPerfMan;
+    private DeviceDataManager deviceDataManager;
 
     /**
      * Logger setup.
@@ -26,34 +26,20 @@ public class App {
 
     public App(
             String[] args,
-            SystemPerformanceManager sysPerfMan) {
+            DeviceDataManager deviceDataManager) {
 
         App.log.info("Initializing Constrained Device Application...");
 
-        this.sysPerfMan = sysPerfMan;
+        this.deviceDataManager = deviceDataManager;
     }
 
     /**
      * Starts the application.
      *
      */
-    public void start() {
+    public void run() {
         App.log.info("Constrained Device Application initialized successfully!");
 
-        try {
-            this.sysPerfMan.start();
-            Thread.sleep(600000L);
-        } catch (InterruptedException e) {
-        }
-    }
-
-    /**
-     * Shuts down the application.
-     *
-     */
-    public void stop() {
-        App.log.info("Closing Constrained Device Application...");
-
-        this.sysPerfMan.stop();
+        this.deviceDataManager.init();
     }
 }

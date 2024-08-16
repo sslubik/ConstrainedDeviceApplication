@@ -9,8 +9,10 @@ import java.util.logging.Level;
 import org.cda.common.utils.ConfigUtil;
 import org.cda.common.enums.ConfigIntegers;
 import org.cda.data.SystemData;
+import org.cda.data.SystemDataHandlerInterface;
 import org.cda.system.systemmonitors.*;
 
+import lombok.Setter;
 import lombok.extern.java.Log;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -21,9 +23,12 @@ import oshi.hardware.Sensors;
 @Log
 public class SystemPerformanceManager {
 
-    private SystemData systemData;
-    private boolean isStarted = false;
+    private final SystemData systemData = new SystemData();
+    private boolean isInitialized = false;
     private int pollRate;
+
+    @Setter
+    private SystemDataHandlerInterface systemDataHandler;
 
     private final SystemResourceMonitorInterface[] systemMonitors;
 
@@ -46,9 +51,7 @@ public class SystemPerformanceManager {
      * Default constructor.
      *
      */
-    public SystemPerformanceManager(SystemData systemData) {
-        this.systemData = systemData;
-
+    public SystemPerformanceManager() {
         SystemInfo sysInfo = new SystemInfo();
         HardwareAbstractionLayer hal = sysInfo.getHardware();
         CentralProcessor cpu = hal.getProcessor();
@@ -80,30 +83,23 @@ public class SystemPerformanceManager {
         for (var monitor : this.systemMonitors) {
             monitor.collectTelemetry(this.systemData);
         }
+
+        this.systemDataHandler.handleSystemData(this.systemData);
     }
 
     /**
-     * Starts collecting system telemetry data.
+     * Initializes collecting system telemetry data.
      *
      */
-    public void start() {
-        if (!this.isStarted) {
+    public void init() {
+        if (!this.isInitialized) {
             this.schedExecSrvc.scheduleAtFixedRate(
                     this.taskRunner,
                     0L,
                     this.pollRate,
                     TimeUnit.SECONDS);
 
-            this.isStarted = true;
+            this.isInitialized = true;
         }
-    }
-
-    /**
-     * Terminates collecting system telemetry data.
-     *
-     */
-    public void stop() {
-        this.isStarted = false;
-        this.schedExecSrvc.shutdown();
     }
 }

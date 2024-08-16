@@ -1,15 +1,17 @@
 package org.cda.devices.i2c;
 
-import org.cda.devices.SensorInterface;
+import org.cda.devices.AbstractSensor;
 
 import com.pi4j.io.i2c.I2C;
 
-public abstract class AbstractI2CSensor implements SensorInterface {
+public abstract class AbstractI2CSensor extends AbstractSensor {
 
     protected I2C sensor;
 
     protected AbstractI2CSensor() {
     }
+
+    public abstract void collectData();
 
     /**
      * Reads 8 bits from register as unsigned char and casts it to int.

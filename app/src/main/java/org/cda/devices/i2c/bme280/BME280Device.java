@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 
 import org.cda.common.utils.ConfigUtil;
 import org.cda.common.enums.ConfigIntegers;
-import org.cda.data.WeatherData;
 import org.cda.devices.i2c.AbstractI2CSensor;
 
 import com.pi4j.context.Context;
@@ -81,7 +80,7 @@ public class BME280Device extends AbstractI2CSensor {
     }
 
     @Override
-    public void collectData(WeatherData weatherData) {
+    public void collectData() {
         // Set the device to forced mode
         int ctrl_meas = this.sensor.readRegister(BME280RegisterAddresses.ctrl_meas);
         ctrl_meas |= BME280RegisterMasks.forced_mode;
@@ -108,9 +107,9 @@ public class BME280Device extends AbstractI2CSensor {
         String compPressure = df.format(this.calculatePressure(rawPressure));
         String compHumidity = df.format(this.calculateHumidity(rawHumidity));
 
-        weatherData.setTemperature(Double.parseDouble(compTemperature));
-        weatherData.setPressure(Double.parseDouble(compPressure));
-        weatherData.setHumidity(Double.parseDouble(compHumidity));
+        super.weatherData.setTemperature(Double.parseDouble(compTemperature));
+        super.weatherData.setPressure(Double.parseDouble(compPressure));
+        super.weatherData.setHumidity(Double.parseDouble(compHumidity));
     }
 
     private void collectCalibrationParams() {
