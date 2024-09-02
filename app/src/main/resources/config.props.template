@@ -17,6 +17,9 @@ I2C_BUS_NUMBER = 1
 # WARNING: DO NOT left SDO pin floating, as the I2C address will be undefined.
 I2C_BME280_ADDRESS = 118
 
+# GPIO pin for measuring digital output from YL-83 sensor.
+YL83_PIN = 24
+
 [Azure IoT Hub]
 # Connection string required for connecting the device to Azure IoT Hub
 CONNECTION_STRING = #CHANGEME

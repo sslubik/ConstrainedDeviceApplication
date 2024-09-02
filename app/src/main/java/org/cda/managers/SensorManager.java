@@ -13,6 +13,8 @@ import org.cda.common.utils.ConfigUtil;
 import org.cda.data.WeatherData;
 import org.cda.data.WeatherDataHandlerInterface;
 import org.cda.devices.SensorTask;
+import org.cda.devices.gpio.yl83.YL83Device;
+import org.cda.devices.gpio.yl83.YL83Simulator;
 import org.cda.devices.i2c.bme280.BME280Device;
 import org.cda.devices.i2c.bme280.BME280Simulator;
 
@@ -47,14 +49,17 @@ public class SensorManager {
                     new BME280Simulator());
 
             this.sensors = new SensorTask[] {
+                    new YL83Simulator(this.weatherData)
             };
         } else {
             Context pi4jContext = Pi4J.newAutoContext();
+
             this.i2cManager = new I2CSensorManager(
                     this.weatherData,
                     new BME280Device(pi4jContext, config));
 
             this.sensors = new SensorTask[] {
+                    new YL83Device(this.weatherData, pi4jContext, config)
             };
         }
 
