@@ -5,11 +5,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.cda.common.enums.*;
+import org.cda.common.enums.ConfigBooleans;
+import org.cda.common.enums.ConfigFloats;
+import org.cda.common.enums.ConfigIntegers;
+import org.cda.common.enums.ConfigStrings;
+
+import lombok.extern.java.Log;
 
 /**
  * Class responsible for managing the config file.
  */
+@Log
 public class ConfigUtil {
 
     private final static ConfigUtil instance = new ConfigUtil();

@@ -1,11 +1,17 @@
 package org.cda.data;
 
+import org.cda.data.enums.MessageType;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class SystemData {
+public class SystemData extends AbstractDataMessage {
+
+    public SystemData() {
+        super.messageType = MessageType.SYSTEM_DATA.getString();
+    }
 
     // CPU related parameters
     double cpuTemp;

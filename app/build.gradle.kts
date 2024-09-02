@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    // Lombok
     compileOnly("org.projectlombok:lombok:1.18.32")
     annotationProcessor("org.projectlombok:lombok:1.18.32")
     testCompileOnly("org.projectlombok:lombok:1.18.32")
@@ -26,6 +27,9 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    // This dependency is used to connecto to azure IoT Hub
+    implementation("com.microsoft.azure.sdk.iot:iot-device-client:2.5.0")
 
     // This dependency is used to parse objects to JSON and JSON to objects
     implementation("com.google.code.gson:gson:2.11.0")
