@@ -106,6 +106,7 @@ public class BME280Device extends AbstractI2CSensor {
         String compTemperature = df.format(this.calculateTemperature(rawTemperature));
         String compPressure = df.format(this.calculatePressure(rawPressure));
         String compHumidity = df.format(this.calculateHumidity(rawHumidity));
+        System.out.println("Raw humidity: " + rawHumidity);
 
         super.weatherData.setTemperature(Double.parseDouble(compTemperature));
         super.weatherData.setPressure(Double.parseDouble(compPressure));
@@ -128,18 +129,24 @@ public class BME280Device extends AbstractI2CSensor {
         this.dig_P9 = super.read16s(BME280RegisterAddresses.dig_P9);
 
         this.dig_H1 = super.read8u(BME280RegisterAddresses.dig_H1);
+        System.out.println(dig_H1);
         this.dig_H2 = super.read16s(BME280RegisterAddresses.dig_H2);
+        System.out.println(dig_H2);
         this.dig_H3 = super.read8u(BME280RegisterAddresses.dig_H3);
+        System.out.println(dig_H3);
 
         byte[] buffer = new byte[2];
 
         this.sensor.readRegister(BME280RegisterAddresses.dig_H4, buffer);
         this.dig_H4 = (short) (((buffer[1] & 0xFF) << 4) | (buffer[0] & 0x0F));
+        System.out.println(dig_H4);
 
         this.sensor.readRegister(BME280RegisterAddresses.dig_H5, buffer);
         this.dig_H5 = (short) (((buffer[1] & 0xFF) << 4) | ((buffer[0] & 0xF0) >> 4));
+        System.out.println(dig_H5);
 
         this.dig_H6 = super.read8s(BME280RegisterAddresses.dig_H6);
+        System.out.println(dig_H6);
     }
 
     /**
@@ -206,11 +213,12 @@ public class BME280Device extends AbstractI2CSensor {
      *
      */
     private double calculateHumidity(int rawHumidity) {
-        double hum = ((double) this.t_fine) - 76800.0;
-        hum = (rawHumidity - (this.dig_H4 * 64.0 + this.dig_H5 / 16384.0 * hum))
-                * (this.dig_H2 / 65536.0
-                        * (1.0 + this.dig_H6 / 67108864.0 * hum * (1.0 + this.dig_H3 / 67108864.0 * hum)));
-        hum = hum * (1.0 - this.dig_H1 * hum / 524288.0);
+        double hum = ((double) t_fine) - 76800.0;
+        hum = (rawHumidity - (dig_H4 * 64.0 + dig_H5 / 16384.0 * hum))
+                * (dig_H2 / 65536.0 * (1.0 + dig_H6 / 67108864.0 * hum * (1.0 + dig_H3 / 67108864.0 * hum)));
+        hum = hum * (1.0 - dig_H1 * hum / 524288.0);
+
+        System.out.println(hum);
 
         if (hum > 100.0) {
             hum = 100.0;
