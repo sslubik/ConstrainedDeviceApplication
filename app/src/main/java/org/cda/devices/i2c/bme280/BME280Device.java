@@ -2,8 +2,8 @@ package org.cda.devices.i2c.bme280;
 
 import java.text.DecimalFormat;
 
-import org.cda.common.utils.ConfigUtil;
 import org.cda.common.enums.ConfigIntegers;
+import org.cda.common.utils.ConfigUtil;
 import org.cda.devices.i2c.AbstractI2CSensor;
 
 import com.pi4j.context.Context;
@@ -103,7 +103,7 @@ public class BME280Device extends AbstractI2CSensor {
         int rawHumidity = ((buffer[6] & 0xFF) << 8) | (buffer[7] & 0xFF);
 
         DecimalFormat df = new DecimalFormat("0.00");
-        String compTemperature = df.format(this.calculateTemperature(rawTemperature)); 
+        String compTemperature = df.format(this.calculateTemperature(rawTemperature));
         String compPressure = df.format(this.calculatePressure(rawPressure));
         String compHumidity = df.format(this.calculateHumidity(rawHumidity));
 
@@ -206,16 +206,16 @@ public class BME280Device extends AbstractI2CSensor {
      *
      */
     private double calculateHumidity(int rawHumidity) {
-        double hum = (double) t_fine - 76800.0;
-        hum = (rawHumidity - (((double) this.dig_H4) * 64.0 + ((double) this.dig_H5) / 16384.0 * hum))
-                * (((double) this.dig_H2) / 65536.0 * (1.0 + ((double) this.dig_H6) / 67108864.0 * hum
-                        * (1.0 + ((double) this.dig_H3) / 67108864.0 * hum)));
-        hum = hum * (1.0 - ((double) this.dig_H1) * hum / 524288.0);
+        double hum = ((double) this.t_fine) - 76800.0;
+        hum = (rawHumidity - (this.dig_H4 * 64.0 + this.dig_H5 / 16384.0 * hum))
+                * (this.dig_H2 / 65536.0
+                        * (1.0 + this.dig_H6 / 67108864.0 * hum * (1.0 + this.dig_H3 / 67108864.0 * hum)));
+        hum = hum * (1.0 - this.dig_H1 * hum / 524288.0);
 
         if (hum > 100.0) {
-            return 100.0;
+            hum = 100.0;
         } else if (hum < 0.0) {
-            return 0.0;
+            hum = 0.0;
         }
 
         return hum;
