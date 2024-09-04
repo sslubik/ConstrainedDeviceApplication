@@ -62,7 +62,7 @@ public class BME280Device extends AbstractI2CSensor {
 
         // Wait 20 ms after resetting the sensor
         try {
-            Thread.sleep(20);
+            Thread.sleep(300);
         } catch (InterruptedException e) {
         }
 
@@ -129,24 +129,18 @@ public class BME280Device extends AbstractI2CSensor {
         this.dig_P9 = super.read16s(BME280RegisterAddresses.dig_P9);
 
         this.dig_H1 = super.read8u(BME280RegisterAddresses.dig_H1);
-        System.out.println(dig_H1);
         this.dig_H2 = super.read16s(BME280RegisterAddresses.dig_H2);
-        System.out.println(dig_H2);
         this.dig_H3 = super.read8u(BME280RegisterAddresses.dig_H3);
-        System.out.println(dig_H3);
 
         byte[] buffer = new byte[2];
 
         this.sensor.readRegister(BME280RegisterAddresses.dig_H4, buffer);
-        this.dig_H4 = (short) (((buffer[1] & 0xFF) << 4) | (buffer[0] & 0x0F));
-        System.out.println(dig_H4);
+        this.dig_H4 = (short) (((buffer[0] & 0xFF) << 4) | (buffer[1] & 0x0F));
 
         this.sensor.readRegister(BME280RegisterAddresses.dig_H5, buffer);
-        this.dig_H5 = (short) (((buffer[1] & 0xFF) << 4) | ((buffer[0] & 0xF0) >> 4));
-        System.out.println(dig_H5);
+        this.dig_H5 = (short) (((buffer[0] & 0x0F)) | ((buffer[1] & 0xFF) << 4));
 
         this.dig_H6 = super.read8s(BME280RegisterAddresses.dig_H6);
-        System.out.println(dig_H6);
     }
 
     /**
@@ -218,8 +212,6 @@ public class BME280Device extends AbstractI2CSensor {
                 * (((double) dig_H2) / 65536.0 * (1.0 + ((double) dig_H6) / 67108864.0 * hum
                         * (1.0 + ((double) dig_H3) / 67108864.0 * hum)));
         hum = hum * (1.0 - ((double) dig_H1) * hum / 524288.0);
-
-        System.out.println("Humidity before correction: " + hum);
 
         if (hum > 100.0) {
             hum = 100.0;
