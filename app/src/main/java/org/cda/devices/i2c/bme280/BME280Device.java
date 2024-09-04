@@ -106,7 +106,6 @@ public class BME280Device extends AbstractI2CSensor {
         String compTemperature = df.format(this.calculateTemperature(rawTemperature));
         String compPressure = df.format(this.calculatePressure(rawPressure));
         String compHumidity = df.format(this.calculateHumidity(rawHumidity));
-        System.out.println("Raw Humidity: " + rawHumidity);
 
         super.weatherData.setTemperature(Double.parseDouble(compTemperature));
         super.weatherData.setPressure(Double.parseDouble(compPressure));
