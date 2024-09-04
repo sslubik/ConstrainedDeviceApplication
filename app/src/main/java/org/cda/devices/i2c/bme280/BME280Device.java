@@ -106,7 +106,7 @@ public class BME280Device extends AbstractI2CSensor {
         String compTemperature = df.format(this.calculateTemperature(rawTemperature));
         String compPressure = df.format(this.calculatePressure(rawPressure));
         String compHumidity = df.format(this.calculateHumidity(rawHumidity));
-        System.out.println("Raw humidity: " + rawHumidity);
+        System.out.println("Raw Humidity: " + rawHumidity);
 
         super.weatherData.setTemperature(Double.parseDouble(compTemperature));
         super.weatherData.setPressure(Double.parseDouble(compPressure));
@@ -213,17 +213,19 @@ public class BME280Device extends AbstractI2CSensor {
      *
      */
     private double calculateHumidity(int rawHumidity) {
-        double hum = ((double) t_fine) - 76800.0;
-        hum = (rawHumidity - (dig_H4 * 64.0 + dig_H5 / 16384.0 * hum))
-                * (dig_H2 / 65536.0 * (1.0 + dig_H6 / 67108864.0 * hum * (1.0 + dig_H3 / 67108864.0 * hum)));
-        hum = hum * (1.0 - dig_H1 * hum / 524288.0);
+        double hum = (double) t_fine - 76800.0;
+        hum = (rawHumidity - (((double) this.dig_H4) * 64.0 + ((double) this.dig_H5) / 16384.0 * hum))
+                * (((double) dig_H2) / 65536.0 * (1.0 + ((double) dig_H6) / 67108864.0 * hum
+                        * (1.0 + ((double) dig_H3) / 67108864.0 * hum)));
+        hum = hum * (1.0 - ((double) dig_H1) * hum / 524288.0);
 
-        System.out.println(hum);
+        System.out.println("Humidity before correction: " + hum);
 
         if (hum > 100.0) {
             hum = 100.0;
         } else if (hum < 0.0) {
             hum = 0.0;
+
         }
 
         return hum;
