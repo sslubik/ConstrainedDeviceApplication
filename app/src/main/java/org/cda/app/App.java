@@ -1,34 +1,18 @@
 package org.cda.app;
 
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-
 import org.cda.managers.DeviceDataManager;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
-@Log
+@Slf4j
 public class App {
 
     private DeviceDataManager deviceDataManager;
-
-    /**
-     * Logger setup.
-     *
-     */
-    static {
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setLevel(Level.ALL);
-        log.addHandler(handler);
-        log.setUseParentHandlers(false);
-        log.setLevel(Level.ALL);
-    }
 
     public App(
             String[] args,
             DeviceDataManager deviceDataManager) {
 
-        App.log.info("Initializing Constrained Device Application...");
 
         this.deviceDataManager = deviceDataManager;
     }

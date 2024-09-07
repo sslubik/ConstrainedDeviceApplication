@@ -13,9 +13,9 @@ import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
 import com.microsoft.azure.sdk.iot.device.Message;
 import com.microsoft.azure.sdk.iot.device.exceptions.IotHubClientException;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
-@Log
+@Slf4j
 public class DeviceDataManager
         implements
         SystemDataHandlerInterface,
@@ -41,12 +41,12 @@ public class DeviceDataManager
             client.open(true);
 
         } catch (IllegalArgumentException e) {
-            DeviceDataManager.log.warning("Incorrect Azure IoT Connection String! Aborting...");
+            DeviceDataManager.log.warn("Incorrect Azure IoT Connection String! Aborting...");
             e.printStackTrace();
             System.exit(1);
         } catch (IotHubClientException e) {
             DeviceDataManager.log
-                    .warning("Connection cannot be established or the server rejects the connection! Aborting...");
+                    .warn("Connection cannot be established or the server rejects the connection! Aborting...");
             e.printStackTrace();
             System.exit(1);
         }
@@ -77,7 +77,7 @@ public class DeviceDataManager
 
             DeviceDataManager.log.info("Successfully sent system data to the cloud!");
         } catch (IotHubClientException e) {
-            DeviceDataManager.log.warning("The request is rejected by the service or the operation timed out!");
+            DeviceDataManager.log.warn("The request is rejected by the service or the operation timed out!");
             e.printStackTrace();
         } catch (InterruptedException | IllegalStateException e) {
         }
@@ -93,7 +93,7 @@ public class DeviceDataManager
 
             DeviceDataManager.log.info("Successfully sent weather data to the cloud!");
         } catch (IotHubClientException e) {
-            DeviceDataManager.log.warning("The request is rejected by the service or the operation timed out!");
+            DeviceDataManager.log.warn("The request is rejected by the service or the operation timed out!");
             e.printStackTrace();
         } catch (InterruptedException | IllegalStateException e) {
         }

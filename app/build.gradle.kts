@@ -38,13 +38,25 @@ dependencies {
     implementation("com.github.oshi:oshi-core:6.6.1")
 
     // This dependency is used to communicate with Raspberry Pi's GPIO
-    implementation("com.pi4j:pi4j-plugin-linuxfs:2.6.0")
+    implementation("com.pi4j:pi4j-core:2.6.1")
+    implementation("com.pi4j:pi4j-plugin-raspberrypi:2.6.1")
+    implementation("com.pi4j:pi4j-plugin-linuxfs:2.6.1")
+    implementation("com.pi4j:pi4j-plugin-gpiod:2.6.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+group = "org.cda"
+version = "1.0-SNAPSHOT"
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "org.cda.Main"
     }
 }
 

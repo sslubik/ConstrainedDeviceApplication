@@ -10,12 +10,12 @@ import org.cda.common.enums.ConfigFloats;
 import org.cda.common.enums.ConfigIntegers;
 import org.cda.common.enums.ConfigStrings;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class responsible for managing the config file.
  */
-@Log
+@Slf4j
 public class ConfigUtil {
 
     private final static ConfigUtil instance = new ConfigUtil();

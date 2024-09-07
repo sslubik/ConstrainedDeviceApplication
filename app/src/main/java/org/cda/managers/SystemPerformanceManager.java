@@ -3,24 +3,23 @@ package org.cda.managers;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 
-import org.cda.common.utils.ConfigUtil;
 import org.cda.common.enums.ConfigIntegers;
+import org.cda.common.utils.ConfigUtil;
 import org.cda.data.SystemData;
 import org.cda.data.SystemDataHandlerInterface;
-import org.cda.system.systemmonitors.*;
+import org.cda.system.systemmonitors.SystemCpuMonitor;
+import org.cda.system.systemmonitors.SystemDiskMonitor;
+import org.cda.system.systemmonitors.SystemMemoryMonitor;
+import org.cda.system.systemmonitors.SystemResourceMonitorInterface;
 
 import lombok.Setter;
-import lombok.extern.java.Log;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.Sensors;
 
-@Log
 public class SystemPerformanceManager {
 
     private final SystemData systemData = new SystemData();
@@ -34,18 +33,6 @@ public class SystemPerformanceManager {
 
     private final ScheduledExecutorService schedExecSrvc = Executors.newScheduledThreadPool(1);
     private final Runnable taskRunner;
-
-    /**
-     * Logger setup.
-     *
-     */
-    static {
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setLevel(Level.ALL);
-        log.addHandler(handler);
-        log.setUseParentHandlers(false);
-        log.setLevel(Level.ALL);
-    }
 
     /**
      * Default constructor.

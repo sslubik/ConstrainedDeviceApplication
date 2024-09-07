@@ -8,6 +8,7 @@ import org.cda.devices.SensorTask;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalInput;
 import com.pi4j.io.gpio.digital.DigitalState;
+import com.pi4j.io.gpio.digital.PullResistance;
 
 public class YL83Device extends SensorTask {
 
@@ -18,7 +19,9 @@ public class YL83Device extends SensorTask {
 
         var inputConfig = DigitalInput.newConfigBuilder(pi4j)
                 .id("YL-83")
-                .address(config.getInteger(ConfigIntegers.YL83_PIN));
+                .name("Rain sensor")
+                .address(config.getInteger(ConfigIntegers.YL83_PIN))
+                .pull(PullResistance.PULL_UP);
 
         this.yl83 = pi4j.create(inputConfig);
     }
@@ -30,7 +33,7 @@ public class YL83Device extends SensorTask {
     @Override
     public Void call() {
         // If sensor pulls down the pin, then raining = true
-        super.weatherData.setRaining(this.yl83.equals(DigitalState.LOW));
+        super.weatherData.setRaining(this.yl83.state() == DigitalState.LOW);
 
         return null;
     }
