@@ -8,11 +8,14 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    id("java")
+    id("com.gradleup.shadow") version "8.3.0"
 }
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
@@ -60,6 +63,12 @@ tasks.jar {
         attributes["Main-Class"] = "org.cda.Main"
     }
     from(sourceSets.main.get().output)
+}
+
+tasks.shadowJar {
+    manifest {
+        archiveClassifier.set("")
+    }
 }
 
 application {
