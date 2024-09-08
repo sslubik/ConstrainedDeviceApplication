@@ -22,6 +22,10 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok:1.18.32")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
 
+    // Slf4j
+    implementation("org.slf4j:slf4j-api:2.1.0-alpha1")
+    implementation("org.slf4j:slf4j-simple:2.1.0-alpha1")
+
     // Use JUnit test framework.
     testImplementation(libs.junit)
 
@@ -38,10 +42,7 @@ dependencies {
     implementation("com.github.oshi:oshi-core:6.6.1")
 
     // This dependency is used to communicate with Raspberry Pi's GPIO
-    implementation("com.pi4j:pi4j-core:2.6.1")
-    implementation("com.pi4j:pi4j-plugin-raspberrypi:2.6.1")
     implementation("com.pi4j:pi4j-plugin-linuxfs:2.6.1")
-    implementation("com.pi4j:pi4j-plugin-gpiod:2.6.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -52,12 +53,13 @@ java {
 }
 
 group = "org.cda"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 tasks.jar {
     manifest {
         attributes["Main-Class"] = "org.cda.Main"
     }
+    from(sourceSets.main.get().output)
 }
 
 application {
