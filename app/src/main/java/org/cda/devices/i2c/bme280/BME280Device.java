@@ -62,7 +62,7 @@ public class BME280Device extends AbstractI2CSensor {
 
         // Wait 20 ms after resetting the sensor
         try {
-            Thread.sleep(300);
+            Thread.sleep(20);
         } catch (InterruptedException e) {
         }
 

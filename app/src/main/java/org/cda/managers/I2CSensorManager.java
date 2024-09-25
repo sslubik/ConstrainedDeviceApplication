@@ -22,7 +22,7 @@ public class I2CSensorManager implements Callable<Void> {
      *
      */
     public void init() {
-        if (!isInitialized) {
+        if (!this.isInitialized) {
             for (var sensor : this.i2cSensors) {
                 sensor.setup();
                 sensor.setWeatherData(this.weatherData);
