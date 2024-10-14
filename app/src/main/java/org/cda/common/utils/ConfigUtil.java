@@ -1,8 +1,9 @@
 package org.cda.common.utils;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import org.cda.common.enums.ConfigBooleans;
@@ -26,20 +27,27 @@ public class ConfigUtil {
      *
      */
     private ConfigUtil() {
-        final String configPath = "config.props";
+        try {
+            final String jarPath = new File(
+                    ConfigUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+            File jarFile = new File(jarPath);
+            File jarParentDir = jarFile.getParentFile();
 
-        try (InputStream config = getClass().getClassLoader().getResourceAsStream(configPath)) {
-            if (config == null) {
-                throw new FileNotFoundException(
-                        "Failed to read config.props file! Make sure it's located in app/src/main/resources directory.");
+            File configFile = new File(jarParentDir, "config.props");
+
+            if (!configFile.exists()) {
+                ConfigUtil.log.error("The config file \"config.props\" in the .jar direcotry does not exist! Aborting...");
+                System.exit(1);
             }
 
-            this.properties.load(config);
+            FileInputStream fis = new FileInputStream(configFile);
+            this.properties.load(fis);
+            fis.close();
 
-        } catch (IOException e) {
+            ConfigUtil.log.info("Successfully loaded app configuration form config.props!");
+
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
-
-            System.exit(1);
         }
     }
 

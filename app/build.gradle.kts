@@ -12,6 +12,9 @@ plugins {
     id("com.gradleup.shadow") version "8.3.0"
 }
 
+version = "1.0.1"
+group = "org.cda"
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
@@ -55,31 +58,22 @@ java {
     }
 }
 
-group = "org.cda"
-version = "1.0"
-
 tasks.jar {
     manifest {
         attributes["Main-Class"] = "org.cda.Main"
     }
-    from(sourceSets.main.get().output)
 }
 
 tasks.shadowJar {
     manifest {
         archiveClassifier.set("")
     }
+    destinationDirectory.set(file("${project.buildDir}/jar"))
+    archiveFileName.set("cda-${project.version}.jar")
+    from(sourceSets.main.get().output)
 }
 
 application {
     // Define the main class for the application.
     mainClass = "org.cda.Main"
-}
-
-tasks.withType<Copy> {
-    from("src/main/resources") {
-        include("config.props")
-        include("config.props.template")
-        into("build/resources/main")
-    }
 }
