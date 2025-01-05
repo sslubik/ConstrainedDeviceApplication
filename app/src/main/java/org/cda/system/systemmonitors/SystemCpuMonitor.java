@@ -24,7 +24,10 @@ public class SystemCpuMonitor implements SystemResourceMonitorInterface {
         double[] loadAvg = this.cpu.getSystemLoadAverage(1);
         double cpuTemp = this.sensors.getCpuTemperature();
 
-        systemData.setCpuLoadAvg(loadAvg[0] * 100);
+        double roundedLoadAvg = loadAvg[0] * 100;
+        roundedLoadAvg = Math.round(roundedLoadAvg * 100.0) / 100.0;
+
+        systemData.setCpuLoadAvg(roundedLoadAvg);
         systemData.setCpuTemp(cpuTemp);
     }
 }

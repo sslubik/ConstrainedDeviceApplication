@@ -31,14 +31,12 @@ public class SystemPerformanceManager {
 
     private final SystemResourceMonitorInterface[] systemMonitors;
 
-    private final ScheduledExecutorService schedExecSrvc = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService schedExecSrvc;
     private final Runnable taskRunner;
 
-    /**
-     * Default constructor.
-     *
-     */
     public SystemPerformanceManager() {
+        this.schedExecSrvc = Executors.newScheduledThreadPool(1);
+
         SystemInfo sysInfo = new SystemInfo();
         HardwareAbstractionLayer hal = sysInfo.getHardware();
         CentralProcessor cpu = hal.getProcessor();
@@ -51,22 +49,17 @@ public class SystemPerformanceManager {
                 new SystemDiskMonitor()
         };
 
-        this.pollRate = ConfigUtil.getInstance().getInteger(ConfigIntegers.POLL_RATE);
-        this.pollRate = Math.max(pollRate, 10); // Set to 10 in case a negative number is provided
+        ConfigUtil config = ConfigUtil.getInstance();
+
+        this.pollRate = config.getInteger(ConfigIntegers.POLL_RATE);
+        this.pollRate = Math.max(pollRate, 10);
 
         this.taskRunner = () -> {
             this.handleTelemetry();
         };
     }
 
-    /**
-     * Handles telemetry by running
-     * SystemResourceMonitorInterface.collectTelemetry()
-     * on each SystemResourceMonitor that has been added to the systemMonitors
-     * array.
-     *
-     */
-    public void handleTelemetry() {
+    private void handleTelemetry() {
         for (var monitor : this.systemMonitors) {
             monitor.collectTelemetry(this.systemData);
         }
@@ -74,10 +67,6 @@ public class SystemPerformanceManager {
         this.systemDataHandler.handleSystemData(this.systemData);
     }
 
-    /**
-     * Initializes collecting system telemetry data.
-     *
-     */
     public void init() {
         if (!this.isInitialized) {
             this.schedExecSrvc.scheduleAtFixedRate(

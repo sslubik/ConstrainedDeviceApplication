@@ -7,22 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class App {
 
-    private DeviceDataManager deviceDataManager;
+    private DeviceDataManager deviceDataManager = new DeviceDataManager();
 
-    public App(
-            String[] args,
-            DeviceDataManager deviceDataManager) {
-
-
-        this.deviceDataManager = deviceDataManager;
-    }
-
-    /**
-     * Starts the application.
-     *
-     */
     public void run() {
-        App.log.info("Constrained Device Application initialized successfully!");
+        App.log.info(
+            "Constrained Device Application initialized successfully!");
 
         this.deviceDataManager.init();
     }

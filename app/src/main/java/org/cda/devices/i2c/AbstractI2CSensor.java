@@ -8,9 +8,6 @@ public abstract class AbstractI2CSensor extends AbstractSensor {
 
     protected I2C sensor;
 
-    protected AbstractI2CSensor() {
-    }
-
     public abstract void collectData();
 
     /**

@@ -22,7 +22,9 @@ import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SensorManager {
 
     private boolean isInitialized = false;
@@ -42,7 +44,7 @@ public class SensorManager {
     public SensorManager() {
         ConfigUtil config = ConfigUtil.getInstance();
 
-        // Add new sensors/simulators over here
+        // Add new sensors/emulators over here
         if (config.getBoolean(ConfigBooleans.ENABLE_EMULATION)) {
             this.i2cManager = new I2CSensorManager(
                     this.weatherData,
@@ -63,11 +65,12 @@ public class SensorManager {
             };
         }
 
-        this.pollRate = ConfigUtil.getInstance().getInteger(ConfigIntegers.POLL_RATE);
-        this.pollRate = Math.max(this.pollRate, 10); // Set to 10 in case a negative number is provided
+        this.pollRate = config.getInteger(ConfigIntegers.POLL_RATE);
+        this.pollRate = Math.max(this.pollRate, 10);
 
         // Create ExecutorService for each SensorTask + I2CSensorManager
-        this.measExecSrvc = Executors.newFixedThreadPool(this.sensors.length + 1);
+        this.measExecSrvc = Executors
+                .newFixedThreadPool(this.sensors.length + 1);
 
         this.schedExecSrvc = Executors.newScheduledThreadPool(1);
         this.taskRunner = () -> {
@@ -75,11 +78,6 @@ public class SensorManager {
         };
     }
 
-    /**
-     * Initializes Runnable task that collects weather measurements and sets up
-     * I2CSensorManager and SensorTask[] fields.
-     *
-     */
     public void init() {
         if (!this.isInitialized) {
             this.schedExecSrvc.scheduleAtFixedRate(
@@ -99,7 +97,7 @@ public class SensorManager {
     }
 
     private void collectWeatherData() {
-        ArrayList<Callable<Void>> tasks = new ArrayList<>(this.sensors.length + 1);
+        ArrayList<Callable<Void>> tasks = new ArrayList<>(sensors.length + 1);
 
         tasks.add(this.i2cManager);
 
@@ -110,7 +108,9 @@ public class SensorManager {
         try {
             this.measExecSrvc.invokeAll(tasks);
         } catch (InterruptedException e) {
-            // TODO: log the exception
+            this.log.error("Error during executing sensor measurement tasks: ");
+            e.printStackTrace();
+            System.exit(1);
         }
 
         this.weatherDataHandler.handleWeatherData(this.weatherData);

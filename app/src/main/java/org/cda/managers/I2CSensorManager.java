@@ -12,7 +12,9 @@ public class I2CSensorManager implements Callable<Void> {
     private final AbstractI2CSensor[] i2cSensors;
     private final WeatherData weatherData;
 
-    public I2CSensorManager(WeatherData weatherData, AbstractI2CSensor... i2cSensors) {
+    public I2CSensorManager(
+            WeatherData weatherData,
+            AbstractI2CSensor... i2cSensors) {
         this.weatherData = weatherData;
         this.i2cSensors = i2cSensors;
     }

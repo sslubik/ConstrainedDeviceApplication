@@ -21,12 +21,15 @@ public class DeviceDataManager
         SystemDataHandlerInterface,
         WeatherDataHandlerInterface {
 
-    private final SystemPerformanceManager sysPerfMan = new SystemPerformanceManager();
-    private final SensorManager sensMan = new SensorManager();
+    private final SystemPerformanceManager sysPerfMan;
+    private final SensorManager sensMan;
 
     private final DeviceClient client;
 
     public DeviceDataManager() {
+        this.sysPerfMan = new SystemPerformanceManager();
+        this.sensMan = new SensorManager();
+
         this.sysPerfMan.setSystemDataHandler(this);
         this.sensMan.setWeatherDataHandler(this);
 
@@ -41,12 +44,14 @@ public class DeviceDataManager
             client.open(true);
 
         } catch (IllegalArgumentException e) {
-            DeviceDataManager.log.warn("Incorrect Azure IoT Connection String! Aborting...");
+            DeviceDataManager.log.warn(
+                    "Incorrect Azure IoT Connection String! Aborting...");
             e.printStackTrace();
             System.exit(1);
         } catch (IotHubClientException e) {
             DeviceDataManager.log
-                    .warn("Connection cannot be established or the server rejects the connection! Aborting...");
+                    .warn("Connection cannot be established or the server "
+                            + "rejects the connection! Aborting...");
             e.printStackTrace();
             System.exit(1);
         }
@@ -58,7 +63,8 @@ public class DeviceDataManager
         // Shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             this.client.close();
-            DeviceDataManager.log.info("Connection to Azure IoT Hub closed successfully!");
+            DeviceDataManager.log.info(
+                    "Connection to Azure IoT Hub closed successfully!");
         }));
     }
 
@@ -75,9 +81,12 @@ public class DeviceDataManager
         try {
             this.client.sendEvent(new Message(systemDataJson));
 
-            DeviceDataManager.log.info("Successfully sent system data to the cloud!");
+            DeviceDataManager.log.info(
+                    "Successfully sent system data to the cloud!");
         } catch (IotHubClientException e) {
-            DeviceDataManager.log.warn("The request is rejected by the service or the operation timed out!");
+            DeviceDataManager.log.warn(
+                    "The request is rejected by the service or the operation "
+                            + "timed out!");
             e.printStackTrace();
         } catch (InterruptedException | IllegalStateException e) {
         }
@@ -91,9 +100,12 @@ public class DeviceDataManager
         try {
             this.client.sendEvent(new Message(weatherDataJson));
 
-            DeviceDataManager.log.info("Successfully sent weather data to the cloud!");
+            DeviceDataManager.log.info(
+                    "Successfully sent weather data to the cloud!");
         } catch (IotHubClientException e) {
-            DeviceDataManager.log.warn("The request is rejected by the service or the operation timed out!");
+            DeviceDataManager.log.warn(
+                    "The request is rejected by the service or the operation "
+                            + "timed out!");
             e.printStackTrace();
         } catch (InterruptedException | IllegalStateException e) {
         }

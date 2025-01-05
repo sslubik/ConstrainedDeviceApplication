@@ -22,7 +22,10 @@ public class SystemMemoryMonitor implements SystemResourceMonitorInterface {
         double totalMemory = this.memory.getTotal() / (1024.0 * 1024);
         double usedMemory = totalMemory - availableMemory;
 
-        systemData.setMemoryTotal(totalMemory);
-        systemData.setMemoryUsed(usedMemory);
+        double roundedTotalMemory = Math.round(totalMemory * 100.0) / 100.0;
+        double roundedUsedMemory = Math.round(usedMemory * 100.0) / 100.0;
+
+        systemData.setMemoryTotal(roundedTotalMemory);
+        systemData.setMemoryUsed(roundedUsedMemory);
     }
 }

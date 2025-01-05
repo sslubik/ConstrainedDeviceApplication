@@ -14,7 +14,10 @@ public class YL83Device extends SensorTask {
 
     private final DigitalInput yl83;
 
-    public YL83Device(WeatherData weatherData, Context pi4j, ConfigUtil config) {
+    public YL83Device(
+            WeatherData weatherData,
+            Context pi4j,
+            ConfigUtil config) {
         super.weatherData = weatherData;
 
         var inputConfig = DigitalInput.newConfigBuilder(pi4j)
@@ -37,5 +40,4 @@ public class YL83Device extends SensorTask {
 
         return null;
     }
-
 }

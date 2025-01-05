@@ -56,18 +56,22 @@ public class BME280Device extends AbstractI2CSensor {
             throw new Error("The chip ID of BME280 sensor is incorrect!");
         }
 
-        // By default most registers responsible for storing measurement config
-        // are set to 0x00 after powering up, so it is necessary to set them up manually
-        this.sensor.writeRegister(BME280RegisterAddresses.reset, BME280RegisterValues.reset);
+        // By default most registers responsible for
+        // storing measurement config are set to 0x00 after powering up,
+        // so it is necessary to set them up manually
+        this.sensor.writeRegister(BME280RegisterAddresses.reset,
+                BME280RegisterValues.reset);
 
-        // Wait 20 ms after resetting the sensor
+        // Wait 5 ms after resetting the sensor
         try {
-            Thread.sleep(20);
+            Thread.sleep(5);
         } catch (InterruptedException e) {
         }
 
-        // Enable humidity measurement by setting the LSB in ctrl_hum register to 1
-        int ctrl_hum = this.sensor.readRegister(BME280RegisterAddresses.ctrl_hum);
+        // Enable humidity measurement by setting
+        // the LSB in ctrl_hum register to 1
+        int ctrl_hum = this.sensor.readRegister(
+                BME280RegisterAddresses.ctrl_hum);
         ctrl_hum |= BME280RegisterMasks.ctrl_hum_osrs_h_1smpl;
         this.sensor.writeRegister(BME280RegisterAddresses.ctrl_hum, ctrl_hum);
 
@@ -77,39 +81,6 @@ public class BME280Device extends AbstractI2CSensor {
                 BME280RegisterValues.press_and_temp_osrs_1smpl);
 
         collectCalibrationParams();
-    }
-
-    @Override
-    public void collectData() {
-        // Set the device to forced mode
-        int ctrl_meas = this.sensor.readRegister(BME280RegisterAddresses.ctrl_meas);
-        ctrl_meas |= BME280RegisterMasks.forced_mode;
-        this.sensor.writeRegister(BME280RegisterAddresses.ctrl_meas, ctrl_meas);
-
-        // Sleep for t = 1.25 + 2.3*1 + 2.3*1 + 0.575 + 2.3*1 + 0.575 = 9.3 ~ 10
-        // (chapter 9.1 in datasheet)
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-        }
-
-        // Read the measurements
-        byte[] buffer = new byte[8];
-        this.sensor.readRegister(BME280RegisterAddresses.press_msb, buffer);
-
-        // Store row values from registers in integers
-        int rawPressure = ((buffer[0] & 0xFF) << 12) | ((buffer[1] & 0xFF) << 4) | ((buffer[2] & 0xF0) >> 4);
-        int rawTemperature = ((buffer[3] & 0xFF) << 12) | ((buffer[4] & 0xFF) << 4) | ((buffer[5] & 0xF0) >> 4);
-        int rawHumidity = ((buffer[6] & 0xFF) << 8) | (buffer[7] & 0xFF);
-
-        DecimalFormat df = new DecimalFormat("0.00");
-        String compTemperature = df.format(this.calculateTemperature(rawTemperature));
-        String compPressure = df.format(this.calculatePressure(rawPressure));
-        String compHumidity = df.format(this.calculateHumidity(rawHumidity));
-
-        super.weatherData.setTemperature(Double.parseDouble(compTemperature));
-        super.weatherData.setPressure(Double.parseDouble(compPressure));
-        super.weatherData.setHumidity(Double.parseDouble(compHumidity));
     }
 
     private void collectCalibrationParams() {
@@ -137,9 +108,49 @@ public class BME280Device extends AbstractI2CSensor {
         this.dig_H4 = (short) (((buffer[0] & 0xFF) << 4) | (buffer[1] & 0x0F));
 
         this.sensor.readRegister(BME280RegisterAddresses.dig_H5, buffer);
-        this.dig_H5 = (short) (((buffer[0] & 0x0F)) | ((buffer[1] & 0xFF) << 4));
+        this.dig_H5 = (short) (((buffer[0] & 0x0F))
+                | ((buffer[1] & 0xFF) << 4));
 
         this.dig_H6 = super.read8s(BME280RegisterAddresses.dig_H6);
+    }
+
+
+    @Override
+    public void collectData() {
+        // Set the device to forced mode
+        int ctrl_meas = this.sensor.readRegister(
+                BME280RegisterAddresses.ctrl_meas);
+        ctrl_meas |= BME280RegisterMasks.forced_mode;
+        this.sensor.writeRegister(BME280RegisterAddresses.ctrl_meas, ctrl_meas);
+
+        // Sleep for t = 1.25 + 2.3*1 + 2.3*1 + 0.575 + 2.3*1 + 0.575 = 9.3 ~ 10
+        // (chapter 9.1 in datasheet)
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+        }
+
+        // Read the measurements
+        byte[] buffer = new byte[8];
+        this.sensor.readRegister(BME280RegisterAddresses.press_msb, buffer);
+
+        // Store row values from registers in integers
+        int rawPressure = ((buffer[0] & 0xFF) << 12)
+                | ((buffer[1] & 0xFF) << 4)
+                | ((buffer[2] & 0xF0) >> 4);
+        int rawTemperature = ((buffer[3] & 0xFF) << 12)
+                | ((buffer[4] & 0xFF) << 4) | ((buffer[5] & 0xF0) >> 4);
+        int rawHumidity = ((buffer[6] & 0xFF) << 8) | (buffer[7] & 0xFF);
+
+        DecimalFormat df = new DecimalFormat("0.00");
+        String compTemperature = df.format(
+                this.calculateTemperature(rawTemperature));
+        String compPressure = df.format(this.calculatePressure(rawPressure));
+        String compHumidity = df.format(this.calculateHumidity(rawHumidity));
+
+        super.weatherData.setTemperature(Double.parseDouble(compTemperature));
+        super.weatherData.setPressure(Double.parseDouble(compPressure));
+        super.weatherData.setHumidity(Double.parseDouble(compHumidity));
     }
 
     /**
@@ -150,8 +161,10 @@ public class BME280Device extends AbstractI2CSensor {
     private double calculateTemperature(int rawTemperature) {
         int var1, var2;
 
-        var1 = ((rawTemperature >> 3) - (this.dig_T1 << 1)) * (this.dig_T2) >> 11;
-        var2 = (((rawTemperature >> 4) - this.dig_T1) * ((rawTemperature >> 4) - this.dig_T1) >> 12)
+        var1 = ((rawTemperature >> 3) - (this.dig_T1 << 1))
+                * (this.dig_T2) >> 11;
+        var2 = (((rawTemperature >> 4) - this.dig_T1)
+                * ((rawTemperature >> 4) - this.dig_T1) >> 12)
                 * this.dig_T3 >> 14;
 
         this.t_fine = var1 + var2;
@@ -178,7 +191,8 @@ public class BME280Device extends AbstractI2CSensor {
         var2 = var1 * var1 * (long) this.dig_P6;
         var2 += ((var1 * (long) this.dig_P5) << 17);
         var2 += (((long) this.dig_P4) << 35);
-        var1 = ((var1 * var1 * (long) this.dig_P3) >> 8) + ((var1 * (long) this.dig_P2) << 12);
+        var1 = ((var1 * var1 * (long) this.dig_P3) >> 8)
+                + ((var1 * (long) this.dig_P2) << 12);
         var1 = ((1L << 47) + var1) * ((long) this.dig_P1) >> 33;
 
         // Avoid exception caused by division by zero
@@ -207,8 +221,10 @@ public class BME280Device extends AbstractI2CSensor {
      */
     private double calculateHumidity(int rawHumidity) {
         double hum = (double) t_fine - 76800.0;
-        hum = (rawHumidity - (((double) this.dig_H4) * 64.0 + ((double) this.dig_H5) / 16384.0 * hum))
-                * (((double) dig_H2) / 65536.0 * (1.0 + ((double) dig_H6) / 67108864.0 * hum
+        hum = (rawHumidity - (((double) this.dig_H4)
+                * 64.0 + ((double) this.dig_H5) / 16384.0 * hum))
+                * (((double) dig_H2) / 65536.0
+                        * (1.0 + ((double) dig_H6) / 67108864.0 * hum
                         * (1.0 + ((double) dig_H3) / 67108864.0 * hum)));
         hum = hum * (1.0 - ((double) dig_H1) * hum / 524288.0);
 
@@ -261,7 +277,7 @@ class BME280RegisterValues {
 
     static final int id = 0x60;
     static final int reset = 0xB6;
-    static final int press_and_temp_osrs_1smpl = 0x24;
+    static final int press_and_temp_osrs_1smpl = 0x25;
 }
 
 class BME280RegisterMasks {
@@ -269,3 +285,4 @@ class BME280RegisterMasks {
     static final int ctrl_hum_osrs_h_1smpl = 0x01;
     static final int forced_mode = 0x01;
 }
+
