@@ -198,7 +198,7 @@ public class BME280Device extends AbstractI2CSensor {
 
         pressure = 1048576.0 - (double) rawPressure;
         pressure = (pressure - (var2 / 4096.0)) * 6250.0 / var1;
-        var1 *= (double) this.dig_P9 * pressure / 2147483648.0;
+        var1 = (double) this.dig_P9 * pressure * pressure / 2147483648.0;
         var2 = pressure * (double) this.dig_P8 / 32768.0;
         pressure += (var1 + var2 + (double) this.dig_P7) / 16.0;
         pressure /= 100.0; // To get pressure in hPa
