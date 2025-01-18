@@ -114,7 +114,6 @@ public class BME280Device extends AbstractI2CSensor {
         this.dig_H6 = super.read8s(BME280RegisterAddresses.dig_H6);
     }
 
-
     @Override
     public void collectData() {
         // Set the device to forced mode
@@ -159,18 +158,17 @@ public class BME280Device extends AbstractI2CSensor {
      *
      */
     private double calculateTemperature(int rawTemperature) {
-        int var1, var2;
+        double var1, var2, temp;
+        double rawTemp = (double) rawTemperature;
 
-        var1 = ((rawTemperature >> 3) - (this.dig_T1 << 1))
-                * (this.dig_T2) >> 11;
-        var2 = (((rawTemperature >> 4) - this.dig_T1)
-                * ((rawTemperature >> 4) - this.dig_T1) >> 12)
-                * this.dig_T3 >> 14;
+        var1 = rawTemp / 16384.0 - (double) this.dig_T1 / 1024.0;
+        var1 *= (double) this.dig_T2;
+        var2 = rawTemp / 131072.0 - (double) this.dig_T1 / 8192.0;
+        var2 *= var2 * (double) this.dig_T3;
 
-        this.t_fine = var1 + var2;
+        this.t_fine = (int) (var1 + var2);
 
-        double temp = (double) ((this.t_fine * 5 + 128) >> 8);
-        temp /= 100.0;
+        temp = (var1 + var2) / 5120.0;
 
         if (temp < -273.15) {
             return -273.15;
@@ -185,33 +183,30 @@ public class BME280Device extends AbstractI2CSensor {
      *
      */
     private double calculatePressure(int rawPressure) {
-        long var1, var2, p;
+        double var1, var2, var3, pressure;
 
-        var1 = ((long) this.t_fine) - 128000;
-        var2 = var1 * var1 * (long) this.dig_P6;
-        var2 += ((var1 * (long) this.dig_P5) << 17);
-        var2 += (((long) this.dig_P4) << 35);
-        var1 = ((var1 * var1 * (long) this.dig_P3) >> 8)
-                + ((var1 * (long) this.dig_P2) << 12);
-        var1 = ((1L << 47) + var1) * ((long) this.dig_P1) >> 33;
+        var1 = (double) this.t_fine / 2.0 - 64000.0;
+        var2 = var1 * var1 * (double) this.dig_P6 / 32768.0;
+        var2 += var1 * (double) this.dig_P5 * 2.0;
+        var2 = var2 / 4.0 + (double) this.dig_P4 * 65536.0;
+        var3 = (double) this.dig_P3 * var1 * var1 / 524288.0;
+        var1 = (var3 + (double) this.dig_P2 * var1) / 524288.0;
+        var1 = (1.0 + var1 / 32768.0) * (double) this.dig_P1;
 
-        // Avoid exception caused by division by zero
-        if (var1 == 0) {
+        if (var1 <= 0.0)
             return 0.0;
-        }
 
-        p = 1048576 - rawPressure;
-        p = (((p << 31) - var2) * 3125) / var1;
-        var1 = (((long) this.dig_P9) * (p >> 13) * (p >> 13)) >> 25;
-        var2 = (((long) this.dig_P8) * p) >> 19;
-        p = ((p + var1 + var2) >> 8) + (((long) this.dig_P7) << 4);
-        p /= 256;
+        pressure = 1048576.0 - (double) rawPressure;
+        pressure = (pressure - (var2 / 4096.0)) * 6250.0 / var1;
+        var1 = (double) this.dig_P9 * pressure * pressure / 2147483648.0;
+        var2 = pressure * (double) this.dig_P8 / 32768.0;
+        pressure += (var1 + var2 + (double) this.dig_P7) / 16.0;
+        pressure /= 100.0; // To get pressure in hPa
 
-        if (p < 0) {
+        if (pressure < 0)
             return 0.0;
-        }
 
-        return p / 100.0;
+        return pressure;
     }
 
     /**
@@ -220,19 +215,22 @@ public class BME280Device extends AbstractI2CSensor {
      *
      */
     private double calculateHumidity(int rawHumidity) {
-        double hum = (double) t_fine - 76800.0;
-        hum = (rawHumidity - (((double) this.dig_H4)
-                * 64.0 + ((double) this.dig_H5) / 16384.0 * hum))
-                * (((double) dig_H2) / 65536.0
-                        * (1.0 + ((double) dig_H6) / 67108864.0 * hum
-                        * (1.0 + ((double) dig_H3) / 67108864.0 * hum)));
-        hum = hum * (1.0 - ((double) dig_H1) * hum / 524288.0);
+        double var1, var2, var3, var4, var5, var6, hum;
+
+        var1 = (double) this.t_fine - 76800.0;
+        var2 = (double) this.dig_H4 * 64.0 +
+                ((double) this.dig_H5 / 16384.0) * var1;
+        var3 = (double) rawHumidity - var2;
+        var4 = (double) this.dig_H2 / 65546.0;
+        var5 = 1.0 + ((double) this.dig_H3 / 67108864.0) * var1;
+        var6 = 1.0 + ((double) this.dig_H6 / 67108864.0) * var1 * var5;
+        var6 *= var3 * var4 * var5;
+        hum = var6 * (1.0 - (double) this.dig_H1 * var6 / 524288.0);
 
         if (hum > 100.0) {
-            hum = 100.0;
+            return 100.0;
         } else if (hum < 0.0) {
-            hum = 0.0;
-
+            return 0.0;
         }
 
         return hum;
@@ -285,4 +283,3 @@ class BME280RegisterMasks {
     static final int ctrl_hum_osrs_h_1smpl = 0x01;
     static final int forced_mode = 0x01;
 }
-
